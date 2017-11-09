@@ -26,7 +26,7 @@ public class MySocketListener {
 					System.out.println("aguardando..."+srv.getLocalPort());
 					
 					Socket cli = srv.accept();
-					cli.setSoTimeout(60000);
+					cli.setSoTimeout(6000);
 					
 					System.out.println("aceito.."+srv.getLocalPort());
 					

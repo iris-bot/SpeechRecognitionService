@@ -1,7 +1,6 @@
 package br.com.irisbot.asr.google.speech;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class GoogleCloudAPI {
 	      // There can be several alternative transcripts for a given chunk of speech. Just use the
 	      // first (most likely) one here.
 	      SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
-	      trans += new String(alternative.getTranscript().getBytes(), StandardCharsets.ISO_8859_1) + " ";
+	      trans += alternative.getTranscript() + " ";
 	      //transcriptions.put("transcriptions",trans);
 	    }
 	    speech.close();
