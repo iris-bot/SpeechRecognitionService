@@ -30,7 +30,7 @@ public class MySocketCli {
 	
 
 	private static void openStream(Path path, int port) throws Exception{
-    	final Socket cli = new Socket("localhost", port);
+    	final Socket cli = new Socket("softlayer01.iris-bot.com.br", port);
 		final byte[] exemplo = Files.readAllBytes(path);
     	
 		new Thread(new Runnable() {
