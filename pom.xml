@@ -3,7 +3,7 @@
   <groupId>SpeechRecognitionService</groupId>
   <artifactId>SpeechRecognitionService</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>maven-plugin</packaging>
+  <packaging>war</packaging>
   <name>pom</name>
   <description>maven pom file</description>
   <dependencies>
@@ -11,6 +11,11 @@
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-speech</artifactId>
       <version>0.26.0-alpha</version>
+   </dependency>
+   <dependency>
+   	<groupId>com.google.code.gson</groupId>
+   	<artifactId>gson</artifactId>
+   	<version>2.8.2</version>
    </dependency>
   </dependencies>
   <build>

@@ -30,9 +30,8 @@ public class MySocketCli {
 	
 
 	private static void openStream(Path path, int port) throws Exception{
-    	final Socket cli = new Socket("softlayer01.iris-bot.com.br", port);
+    	final Socket cli = new Socket("softlayer01.iris-bot.com.br", port); //
 		final byte[] exemplo = Files.readAllBytes(path);
-    	
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -52,7 +51,8 @@ public class MySocketCli {
 					String line = "";
 			    	StringBuffer sb = new StringBuffer();
 			    	while (!br.ready()) Thread.sleep(500);
-			    	while((line = br.readLine())!=null) {
+			    	while((line = br.readLine())!=null && !line.trim().isEmpty()) {
+			    		System.out.println(line);
 			    		sb.append(line + "\n"); 
 			    	}
 			    	cli.close();
@@ -62,7 +62,7 @@ public class MySocketCli {
 			}
 		}).start();
 
-
+		
 	}
 	
 }

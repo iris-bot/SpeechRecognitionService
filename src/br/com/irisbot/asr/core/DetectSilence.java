@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -56,19 +57,15 @@ public class DetectSilence extends Thread{
 	private AudioFormat getFormat() {
 		
 		if(defaultFormat==null) {			
-	        File file = new File("src/proper.wav");
 	        AudioInputStream stream;
 	        try {
+		        File file = new File(DetectSilence.class.getResource("sample/proper.wav").toURI());
 		        if(!file.exists()) throw new FileNotFoundException();
 	            stream = AudioSystem.getAudioInputStream(file);
 	            format=stream.getFormat();
 	            defaultFormat = stream.getFormat();
-	        } catch (FileNotFoundException e) {
-	        	System.out.println("FileNotFoundException");
-	        } catch (UnsupportedAudioFileException e) {
-	        	System.out.println("UnsupportedAudioFileException");
-	        } catch (IOException e) {
-	        	System.out.println("IOException");
+	        } catch (Exception e) {
+	        	e.printStackTrace();
 	        }
 		}
         return defaultFormat;
@@ -81,7 +78,7 @@ public class DetectSilence extends Thread{
 	/*
 	 * TODO: calibrar variáveis em função separada
 	 */
-	public void detectSilenceFromStream(final InputStream is, final OutputStream os) throws IOException, UnsupportedAudioFileException {
+	public void detectSilenceFromStream(final ServerSocket srv,final InputStream is, final OutputStream os) throws IOException, UnsupportedAudioFileException {
 
             Runnable runner = new Runnable() {
                 int bufferSize = (int) format.getSampleRate()*format.getFrameSize();
@@ -91,62 +88,60 @@ public class DetectSilence extends Thread{
                 public void run() {
 
                     out = new ByteArrayOutputStream();
-                    running = true;
                     /*
                      * Contador acumulativo para reconstrução do chat
                      */
                     int countAc = 0;
-                    while (running) {
-                    	File temp = null;
-                    	String seq = null;
-                    	try {
-                        	int count = is.read(buffer, 0, buffer.length);
-                        	countAc += count;
-                            calculateLevel(buffer,0,0);
-                            /*
-                             * Iniciou a fala, começa a gravação
-                             */
-                        	if (isSilence && level >= 0.1) {
-                        		out = new ByteArrayOutputStream();
-                        		isSilence = false;
-                        	}
-                        	if (!isSilence) {
-                        		seq = "000000000000"+countAc;
-                        		temp = new File("audio/"+ seq.substring(seq.length()-12) + "_" + channel + "_" + callId + ".wav");
-                        	}
-                        	
-                            /*
-                             * Level muito baixo indica que a pessoa parou de falar
-                             * Pega o arquivo, para de gravar
-                             */
-                            if (level <= 0.04  && !isSilence && temp != null && seq!=null) {
-                            	String resp = getAudioFile(temp, seq).toString()+"\n";
-                            	os.write(resp.getBytes());
-                            	os.flush();
-                            	isSilence = true;
-                            } else {
-                            	//System.out.print(".");
-                            }
-                            
-                            /*
-                             * mesmo silencio (ou fone mutado) o count dá maior que 0
-                             * só cai no else quando encerra a ligação mesmo
-                             */
-                            if (count >= bufferSize) {
+                    int count = 0; 
+                    try {
+                    	
+	                    while ((count = is.read(buffer, 0, buffer.length)) > -1) {
+	                    	File temp = null;
+	                    	String seq = null;
+	                    	try {
+	                        	countAc += count;
+	                            calculateLevel(buffer,0,0);
+	                            /*
+	                             * Iniciou a fala, começa a gravação
+	                             */
+	                        	if (isSilence && level >= 0.1) {
+	                        		out = new ByteArrayOutputStream();
+	                        		isSilence = false;
+	                        	}
+	                        	if (!isSilence) {
+	                        		seq = "000000000000"+countAc;
+	                        		temp = new File("audio/"+ seq.substring(seq.length()-12) + "_" + channel + "_" + callId + ".wav");
+	                        	}
+	                        	
+	                            /*
+	                             * Level muito baixo indica que a pessoa parou de falar
+	                             * Pega o arquivo, para de gravar
+	                             */
+	                            if (level <= 0.04  && !isSilence && temp != null && seq!=null) {
+	                            	String resp = getAudioFile(temp, seq).toString()+"\n";
+	                            	os.write(resp.getBytes());
+	                            	os.flush();
+	                            	isSilence = true;
+	                            } else {
+	                            	//System.out.print(".");
+	                            }
+	                            
+	                            /*
+	                             * mesmo silencio (ou fone mutado) o count dá maior que 0
+	                             * só cai no else quando encerra a ligação mesmo
+	                             */
                                 out.write(buffer, 0, count);
-                            } else {
-                            	running = false;
-                            	os.close();
-                            }
-                    		
-                    	}catch (IOException e) {
-                            System.err.println("Stream unavailable: " + e);
-                            System.exit(-2);
-						}
-                    	
-                    	
-                    }
-                    //line.stop();
+	                    		
+	                    	}catch (IOException e) {
+	                            e.printStackTrace();
+							}
+	                    }//while
+	                    os.close();
+	                    System.out.println("Encerrando "+srv.getLocalPort());
+	                    srv.close();
+                    }catch (Exception e) {
+						e.printStackTrace();
+					}
                 }
             };
             Thread captureThread = new Thread(runner);
@@ -177,7 +172,7 @@ public class DetectSilence extends Thread{
         	}
         	input.close();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return json;
     }

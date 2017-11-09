@@ -21,20 +21,23 @@ public class MySocketListener {
 					String callId = orchestrator.getCallId(key>=500?key-500:key);
 					
 					ServerSocket srv = new ServerSocket(9000+key);
+					srv.setSoTimeout(30000);
 
 					System.out.println("aguardando..."+srv.getLocalPort());
+					
 					Socket cli = srv.accept();
+					cli.setSoTimeout(60000);
+					
 					System.out.println("aceito.."+srv.getLocalPort());
 					
-					//byte[] bArr = new byte[2048];
 					InputStream is = cli.getInputStream();
 					OutputStream os = cli.getOutputStream();
 					DetectSilence ds = new DetectSilence(channel, callId);
 					/*
 					 * Fica rodando enquanto estiver aberto
 					 */
-					ds.detectSilenceFromStream(is, os);
-					srv.close();
+					ds.detectSilenceFromStream(srv,is, os);
+					
 					orchestrator.releasePort(key);
 					
 				}catch (Throwable e) {
