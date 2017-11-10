@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.JsonObject;
+
 /**
  * Servlet implementation class orchestrator
  */
@@ -41,7 +43,7 @@ public class orchestrator extends HttpServlet {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HashMap<String, Object> PORTAS = new HashMap<>();
+		JsonObject PORTAS = new JsonObject();
 		String codigo = request.getParameter("cod");
 		if(codigo==null) {
 			response.getWriter().append("campo COD esta vazio");
@@ -56,8 +58,8 @@ public class orchestrator extends HttpServlet {
 				 * porta_agente = 9000 + idporta
 				 * porta_cliente = 9500 + idporta
 				 */
-				PORTAS.put("porta_agente", 9000+i);
-				PORTAS.put("porta_cliente", 9500+i);
+				PORTAS.addProperty("porta_agente", 9000+i);
+				PORTAS.addProperty("porta_cliente", 9500+i);
 				
 				MySocketListener.instance(i);
 				MySocketListener.instance(500+i);
@@ -65,6 +67,7 @@ public class orchestrator extends HttpServlet {
 				break;
 			}
 		}
+		response.addHeader("Content-type", "application/json");
 		response.getWriter().append(PORTAS.toString());
 	}
 	
