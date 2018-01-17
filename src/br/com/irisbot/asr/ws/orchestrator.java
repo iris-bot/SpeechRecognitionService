@@ -61,8 +61,8 @@ public class orchestrator extends HttpServlet {
 				PORTAS.addProperty("porta_agente", 9000+i);
 				PORTAS.addProperty("porta_cliente", 9500+i);
 				
-				MySocketListener.instance(i);
-				MySocketListener.instance(500+i);
+				SocketListener.instance(i);
+				SocketListener.instance(500+i);
 				
 				break;
 			}

@@ -19,6 +19,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.google.gson.JsonObject;
 
+import br.com.irisbot.asr.azure.speech.AzureSpeechAPI;
 import br.com.irisbot.asr.google.speech.GoogleCloudAPI;
 
 /**
@@ -260,11 +261,10 @@ public class DetectSilence extends Thread {
 		JsonObject json = new JsonObject();
 		// transforma file wav em byte array
 		try {
-			/*FileInputStream fis = new FileInputStream(file);
-			byte[] bb = new byte[(int) file.length()];
-			fis.read(bb, 0, bb.length);
-			fis.close();*/
+
 			String trans = GoogleCloudAPI.main(file);
+			//String trans1 = AzureSpeechAPI.main(file);
+			
 			// delete file
 			file.delete();
 
@@ -274,6 +274,7 @@ public class DetectSilence extends Thread {
 			}
 			
 			json.addProperty("transcript", trans);
+			//json.addProperty("azure_trans", trans1);
 			json.addProperty("sequence", seq);
 			json.addProperty("call_id", callId);
 			json.addProperty("channel", channel);

@@ -7,7 +7,7 @@ import java.net.Socket;
 
 import br.com.irisbot.asr.core.DetectSilence;
 
-public class MySocketListener {
+public class SocketListener {
 	
 	
 	public static void instance(final int key) {
